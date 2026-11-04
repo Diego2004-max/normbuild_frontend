@@ -26,3 +26,9 @@ jobs:
         run: npm test
       - name: Build production bundle
         run: npm run build
+      - name: Validate production compose configuration
+        env:
+          PUBLIC_DOMAIN: normbuild.example.com
+        run: docker compose -f docker-compose.production.yml config --quiet
+      - name: Build frontend container
+        run: docker build --tag normbuild-frontend:ci .
