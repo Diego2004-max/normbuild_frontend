@@ -48,6 +48,7 @@ const projectMetrics = computed(() => {
 const selectedCoverage = computed(() => coverage.value.find(
   (item) => item.jurisdiction.toLocaleLowerCase('es-CO') === jurisdiction.value.trim().toLocaleLowerCase('es-CO'),
 ));
+const nationalCoverage = computed(() => coverage.value.find((item) => item.jurisdiction === 'Colombia'));
 const sourcePreview = (content: string) => {
   if (content.length <= 360) return content;
   const firstSentence = content.match(/^.*?[.!?](?:\s|$)/s)?.[0];
@@ -205,10 +206,13 @@ onBeforeUnmount(() => {
                 <option v-for="item in coverage" :key="item.jurisdiction" :value="item.jurisdiction" />
               </datalist>
               <p v-if="selectedCoverage?.status === 'AVAILABLE'" class="mt-2 text-xs text-emerald-700 dark:text-emerald-300" role="status">
-                {{ selectedCoverage.officialSources }} fuentes oficiales indexadas · {{ selectedCoverage.indexedSections }} secciones disponibles.
+                {{ selectedCoverage.officialSources }} fuentes locales indexadas · {{ selectedCoverage.indexedSections }} secciones. {{ nationalCoverage?.officialSources ?? 0 }} fuentes nacionales disponibles.
               </p>
               <p v-else-if="selectedCoverage?.status === 'NO_OFFICIAL_SOURCE'" class="mt-2 text-xs text-amber-800 dark:text-amber-200" role="status">
-                Aún no hay documentos oficiales indexados para esta ciudad; la consulta no podrá citar normas locales.
+                Aún no hay fuentes locales indexadas para esta ciudad. {{ nationalCoverage?.officialSources ?? 0 }} fuentes nacionales disponibles; no reemplazan el POT ni los mapas del predio.
+              </p>
+              <p v-else-if="nationalCoverage?.officialSources" class="mt-2 text-xs text-slate-600 dark:text-slate-300" role="status">
+                Hay {{ nationalCoverage.officialSources }} fuentes nacionales indexadas; no se encontró cobertura local confirmada para este nombre.
               </p>
               <p v-else-if="coverageLoadError" class="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 No se pudo cargar el estado documental. Puedes consultar cuando el backend esté disponible.
