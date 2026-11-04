@@ -4,7 +4,25 @@ import type {
 } from '../types/regulation';
 import { readChecklistStream } from './checklistStream';
 
+export interface JurisdictionCoverage {
+  jurisdiction: string;
+  indexedSections: number;
+  officialSources: number;
+  lastIndexedAt: string | null;
+  status: 'AVAILABLE' | 'NO_OFFICIAL_SOURCE';
+}
+
 const apiBaseUrl = import.meta.env.DEV ? '' : (import.meta.env.VITE_NORMBUILD_API_URL ?? '');
+
+export const fetchJurisdictionCoverage = async (): Promise<JurisdictionCoverage[]> => {
+  const response = await fetch(`${apiBaseUrl}/api/regulations/coverage`, {
+    headers: { Accept: 'application/json' },
+  });
+  if (!response.ok) {
+    throw new Error('No fue posible consultar la cobertura documental.');
+  }
+  return response.json() as Promise<JurisdictionCoverage[]>;
+};
 
 interface ApiErrorResponse {
   message?: string;

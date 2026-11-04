@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
-import { requestComplianceChecklist } from '../services/regulationApi';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { fetchJurisdictionCoverage, requestComplianceChecklist } from '../services/regulationApi';
+import type { JurisdictionCoverage } from '../services/regulationApi';
 import type {
   ComplianceChecklistResponse,
   WorkerValidationIssue,
@@ -17,6 +18,8 @@ const validationIssues = ref<WorkerValidationIssue[]>([]);
 const formattedDescription = ref('');
 const wordCount = ref(0);
 const requestError = ref('');
+const coverage = ref<JurisdictionCoverage[]>([]);
+const coverageLoadError = ref(false);
 const elapsedSeconds = ref(0);
 const expandedSources = ref<Record<string, boolean>>({});
 const numberFormatter = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
@@ -42,6 +45,9 @@ const projectMetrics = computed(() => {
     },
   ];
 });
+const selectedCoverage = computed(() => coverage.value.find(
+  (item) => item.jurisdiction.toLocaleLowerCase('es-CO') === jurisdiction.value.trim().toLocaleLowerCase('es-CO'),
+));
 const sourcePreview = (content: string) => {
   if (content.length <= 360) return content;
   const firstSentence = content.match(/^.*?[.!?](?:\s|$)/s)?.[0];
@@ -106,6 +112,14 @@ validationWorker.onmessage = (event: MessageEvent<WorkerValidationResult>) => {
 };
 
 watch([jurisdiction, projectDescription], runValidation, { immediate: true });
+
+onMounted(async () => {
+  try {
+    coverage.value = await fetchJurisdictionCoverage();
+  } catch {
+    coverageLoadError.value = true;
+  }
+});
 
 watch(isDarkMode, (enabled) => {
   document.documentElement.classList.toggle('dark', enabled);
@@ -184,8 +198,21 @@ onBeforeUnmount(() => {
                 v-model="jurisdiction"
                 class="w-full rounded-md border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-civic-blue focus:ring-2 focus:ring-civic-blue/20 dark:border-slate-700 dark:bg-slate-950"
                 placeholder="Ej. Bogotá D.C."
+                list="jurisdiction-options"
                 type="text"
               />
+              <datalist id="jurisdiction-options">
+                <option v-for="item in coverage" :key="item.jurisdiction" :value="item.jurisdiction" />
+              </datalist>
+              <p v-if="selectedCoverage?.status === 'AVAILABLE'" class="mt-2 text-xs text-emerald-700 dark:text-emerald-300" role="status">
+                {{ selectedCoverage.officialSources }} fuentes oficiales indexadas · {{ selectedCoverage.indexedSections }} secciones disponibles.
+              </p>
+              <p v-else-if="selectedCoverage?.status === 'NO_OFFICIAL_SOURCE'" class="mt-2 text-xs text-amber-800 dark:text-amber-200" role="status">
+                Aún no hay documentos oficiales indexados para esta ciudad; la consulta no podrá citar normas locales.
+              </p>
+              <p v-else-if="coverageLoadError" class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                No se pudo cargar el estado documental. Puedes consultar cuando el backend esté disponible.
+              </p>
             </div>
 
             <div>
