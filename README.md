@@ -46,4 +46,19 @@ identifiers and comments are English.
 - Review calculated proposal areas and indices as soon as analysis starts.
 - Read a Spanish checklist grounded in retrieved regulatory documents.
 - Open the official source link and expand its complete indexed text.
-- Review explicit missing-source and model-fallback states.
+- Review explicit missing-source and unavailable-model states.
+## Deployment preflight
+
+Before deployment, copy the production environment template to .env.production,
+set a real public DNS name and unique strong secrets, then run:
+
+    .\scripts\verify-production.ps1 -EnvironmentFile .\.env.production
+
+After both services are running, use the following command to verify DNS, HTTPS,
+the certificate, the public API route and indexed sources for all seven cities:
+
+    .\scripts\verify-production.ps1 -EnvironmentFile .\.env.production -VerifyRunningStack -RequireSevenCityCoverage
+
+The seven-city check intentionally fails until official source documents have
+been reviewed and indexed. It checks source counts; it does not certify legal
+currency or parcel-level applicability.
