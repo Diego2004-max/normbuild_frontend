@@ -36,7 +36,8 @@ Keep ports 80 and 443 open on the host firewall. Do not expose the database or
 Ollama ports publicly.
 
 The development proxy sends `/api` requests to `NORMBUILD_BACKEND_URL`. In
-production, set `VITE_NORMBUILD_API_URL` when the API uses a separate origin.
+production, `/api` remains same-origin and the Nginx service proxies it to the
+backend container.
 The first render always uses light mode. User-facing copy is Spanish; source
 identifiers and comments are English.
 

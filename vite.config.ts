@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
     '/api': {
       target: backendUrl,
       changeOrigin: true,
-      proxyTimeout: 185_000,
+      proxyTimeout: 310_000,
       configure: (instance: import('vite').HttpProxy.Server) => {
         // Browser traffic stays same-origin; the upstream request is server-to-server.
         instance.on('proxyReq', (request) => request.removeHeader('origin'));

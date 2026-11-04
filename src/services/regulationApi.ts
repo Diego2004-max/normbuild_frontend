@@ -34,7 +34,7 @@ export const requestComplianceChecklist = async (
   onProgress: (response: ComplianceChecklistResponse) => void = () => undefined,
 ): Promise<ComplianceChecklistResponse> => {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 190_000);
+  const timeout = window.setTimeout(() => controller.abort(), 310_000);
   try {
     const response = await fetch(`${apiBaseUrl}/api/regulations/compliance-checklist/stream`, {
       method: 'POST',
