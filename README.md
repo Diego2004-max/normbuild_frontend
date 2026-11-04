@@ -37,7 +37,8 @@ Ollama ports publicly.
 
 The development proxy sends `/api` requests to `NORMBUILD_BACKEND_URL`. In
 production, `/api` remains same-origin and the Nginx service proxies it to the
-backend container.
+backend container. The Brave Search API key is configured only in the backend
+environment; this frontend repository never receives or stores that key.
 The first render always uses light mode. User-facing copy is Spanish; source
 identifiers and comments are English.
 
