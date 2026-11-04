@@ -48,6 +48,8 @@ identifiers and comments are English.
 - Read a Spanish checklist grounded in retrieved regulatory documents.
 - Open the official source link and expand its complete indexed text.
 - Review explicit missing-source and unavailable-model states.
+- Search live for additional Colombian municipalities, inspect official `.gov.co` source candidates, and select a municipality.
+- Administrators can import a reviewed, text-based official PDF with a temporary ingestion key; search results are never treated as verified law automatically.
 ## Deployment preflight
 
 Before deployment, copy the production environment template to .env.production,
