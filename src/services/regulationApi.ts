@@ -3,6 +3,9 @@ import type {
   ComplianceQueryRequest,
 } from '../types/regulation';
 import { readChecklistStream } from './checklistStream';
+import { createOfficialSourceClient } from './officialSourceClient';
+import type { OfficialSourceCandidate, OfficialSourceImportResponse, OfficialSourceSearchResponse } from './officialSourceClient';
+export type { OfficialSourceCandidate, OfficialSourceImportResponse, OfficialSourceSearchResponse } from './officialSourceClient';
 
 export interface JurisdictionCoverage {
   jurisdiction: string;
@@ -12,21 +15,8 @@ export interface JurisdictionCoverage {
   status: 'AVAILABLE' | 'NO_OFFICIAL_SOURCE';
 }
 
-export interface OfficialSourceCandidate {
-  title: string;
-  url: string;
-  summary: string;
-  issuingHost: string;
-  reviewStatus: 'REQUIRES_LEGAL_REVIEW';
-}
-
-export interface OfficialSourceSearchResponse {
-  municipality: string;
-  searchedAt: string;
-  candidates: OfficialSourceCandidate[];
-}
-
 const apiBaseUrl = import.meta.env.DEV ? '' : (import.meta.env.VITE_NORMBUILD_API_URL ?? '');
+const officialSourceClient = createOfficialSourceClient(apiBaseUrl);
 
 export const fetchJurisdictionCoverage = async (): Promise<JurisdictionCoverage[]> => {
   const response = await fetch(`${apiBaseUrl}/api/regulations/coverage`, {
@@ -38,18 +28,14 @@ export const fetchJurisdictionCoverage = async (): Promise<JurisdictionCoverage[
   return response.json() as Promise<JurisdictionCoverage[]>;
 };
 
-export const searchOfficialSources = async (municipality: string): Promise<OfficialSourceSearchResponse> => {
-  const response = await fetch(`${apiBaseUrl}/api/regulations/sources/search`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ municipality }),
-  });
-  if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({})) as ApiErrorResponse;
-    throw new Error(errorBody.message ?? 'No fue posible buscar fuentes oficiales para este municipio.');
-  }
-  return response.json() as Promise<OfficialSourceSearchResponse>;
-};
+export const searchOfficialSources = (municipality: string) => officialSourceClient.search(municipality);
+
+export const importOfficialPdfSource = (
+  municipality: string,
+  candidate: OfficialSourceCandidate,
+  regulationCode: string,
+  ingestionKey: string,
+)=> officialSourceClient.importPdf(municipality, candidate, regulationCode, ingestionKey);
 
 interface ApiErrorResponse {
   message?: string;

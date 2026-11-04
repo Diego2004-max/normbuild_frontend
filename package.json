@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node --experimental-strip-types --test tests/checklistStream.test.mjs tests/regulationWorker.test.mjs"
+    "test": "node --experimental-strip-types --test tests/checklistStream.test.mjs tests/regulationWorker.test.mjs tests/officialSourceClient.test.mjs"
   },
   "dependencies": {
     "eventsource-parser": "^4.1.1",
