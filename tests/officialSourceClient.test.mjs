@@ -45,6 +45,8 @@ test('sends the administrative key only with an explicitly confirmed PDF import'
 
   assert.equal(request.url, '/api-root/api/regulations/documents/pdf/from-official-url');
   assert.equal(request.options.headers['X-NormBuild-Ingestion-Key'], 'private-key');
+  assert.equal(request.options.signal instanceof AbortSignal, true);
+  assert.equal(request.options.signal.aborted, false);
   assert.deepEqual(JSON.parse(request.options.body), {
     title: candidate.title,
     jurisdiction: 'Neiva',
@@ -53,4 +55,23 @@ test('sends the administrative key only with an explicitly confirmed PDF import'
     legalReviewConfirmed: true,
   });
   assert.equal(result.indexedChunks, 24);
+});
+
+test('shows a Spanish timeout message when official PDF indexing takes too long', async () => {
+  const client = createOfficialSourceClient('', async () => {
+    throw new DOMException('Timed out', 'TimeoutError');
+  });
+
+  await assert.rejects(
+    client.importPdf('Neiva', candidate, 'Acuerdo 001 de 2024', 'private-key'),
+    /La incorporación tardó demasiado/,
+  );
+});
+
+test('shows a Spanish connection message when the backend cannot be reached', async () => {
+  const client = createOfficialSourceClient('', async () => {
+    throw new TypeError('Failed to fetch');
+  });
+
+  await assert.rejects(client.search('Neiva'), /No fue posible conectar con el servidor/);
 });

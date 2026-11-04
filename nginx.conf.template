@@ -23,8 +23,10 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_buffering off;
         proxy_cache off;
-        proxy_read_timeout 360s;
-        proxy_send_timeout 360s;
+        # PDF parsing and embedding run synchronously within the protected import
+        # request and may need several minutes for a large official document.
+        proxy_read_timeout 900s;
+        proxy_send_timeout 900s;
     }
 
     location / {
