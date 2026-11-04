@@ -18,7 +18,7 @@ export interface ComplianceChecklistResponse {
   riskLevel: string;
   citations: CitedRegulationResponse[];
   generatedAt: string;
-  generationMode?: 'PENDING' | 'GENERATIVE' | 'GUIDED' | 'NO_CONTEXT';
+  generationMode?: 'PENDING' | 'GENERATIVE' | 'UNAVAILABLE' | 'NO_CONTEXT';
   projectAnalysis?: ProjectAnalysisResponse;
 }
 

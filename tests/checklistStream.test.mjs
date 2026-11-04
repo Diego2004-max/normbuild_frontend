@@ -40,6 +40,15 @@ test('preserves the Spanish server error', async () => {
   await assert.rejects(readChecklistStream(bodyFrom(stream), () => {}), /Ollama no está disponible/);
 });
 
+test('delivers an explicit AI unavailable response with its recovered citations', async () => {
+  const message = 'No se generó un checklist porque el modelo local no está disponible.';
+  const stream = 'event:complete\ndata:' + JSON.stringify(response('UNAVAILABLE', message)) + '\n\n';
+  const result = await readChecklistStream(bodyFrom(stream), () => {});
+  assert.equal(result.generationMode, 'UNAVAILABLE');
+  assert.equal(result.answer, message);
+  assert.equal(result.citations[0].excerpt, 'Texto íntegro de la fuente.');
+});
+
 test('rejects pending data sent as a complete event', async () => {
   const stream = `event:complete\ndata:${JSON.stringify(response('PENDING'))}\n\n`;
   await assert.rejects(readChecklistStream(bodyFrom(stream), () => {}), /no se completó/);

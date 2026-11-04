@@ -282,10 +282,10 @@ onBeforeUnmount(() => {
             <p v-else-if="answer.generationMode === 'PENDING'" class="text-sm text-red-700 dark:text-red-300" role="alert">
               La revisión normativa no se completó. Los cálculos de la propuesta siguen disponibles; puedes intentar nuevamente.
             </p>
-            <p v-if="answer.generationMode === 'GUIDED'" class="border-l-4 border-amber-400 bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100" role="status">
-              El modelo local no pudo completar la respuesta. Se muestra una orientación preliminar con las fuentes recuperadas; el cumplimiento está por verificar.
+            <p v-if="answer.generationMode === 'UNAVAILABLE'" class="border-l-4 border-red-500 bg-red-50 p-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-100" role="alert">
+              {{ answer.answer }}
             </p>
-            <article v-if="answer.answer" class="prose prose-slate max-w-none whitespace-pre-line rounded-md bg-slate-50 p-4 text-sm leading-6 dark:prose-invert dark:bg-slate-950">
+            <article v-if="answer.answer && answer.generationMode !== 'UNAVAILABLE'" class="prose prose-slate max-w-none whitespace-pre-line rounded-md bg-slate-50 p-4 text-sm leading-6 dark:prose-invert dark:bg-slate-950">
               {{ answer.answer }}
             </article>
 
