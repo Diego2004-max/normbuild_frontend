@@ -12,6 +12,20 @@ export interface JurisdictionCoverage {
   status: 'AVAILABLE' | 'NO_OFFICIAL_SOURCE';
 }
 
+export interface OfficialSourceCandidate {
+  title: string;
+  url: string;
+  summary: string;
+  issuingHost: string;
+  reviewStatus: 'REQUIRES_LEGAL_REVIEW';
+}
+
+export interface OfficialSourceSearchResponse {
+  municipality: string;
+  searchedAt: string;
+  candidates: OfficialSourceCandidate[];
+}
+
 const apiBaseUrl = import.meta.env.DEV ? '' : (import.meta.env.VITE_NORMBUILD_API_URL ?? '');
 
 export const fetchJurisdictionCoverage = async (): Promise<JurisdictionCoverage[]> => {
@@ -22,6 +36,19 @@ export const fetchJurisdictionCoverage = async (): Promise<JurisdictionCoverage[
     throw new Error('No fue posible consultar la cobertura documental.');
   }
   return response.json() as Promise<JurisdictionCoverage[]>;
+};
+
+export const searchOfficialSources = async (municipality: string): Promise<OfficialSourceSearchResponse> => {
+  const response = await fetch(`${apiBaseUrl}/api/regulations/sources/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ municipality }),
+  });
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({})) as ApiErrorResponse;
+    throw new Error(errorBody.message ?? 'No fue posible buscar fuentes oficiales para este municipio.');
+  }
+  return response.json() as Promise<OfficialSourceSearchResponse>;
 };
 
 interface ApiErrorResponse {
