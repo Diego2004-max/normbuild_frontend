@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { fetchJurisdictionCoverage, requestComplianceChecklist } from '../services/regulationApi';
-import type { JurisdictionCoverage } from '../services/regulationApi';
+import { fetchJurisdictionCoverage, requestComplianceChecklist, searchOfficialSources } from '../services/regulationApi';
+import type { JurisdictionCoverage, OfficialSourceCandidate } from '../services/regulationApi';
 import type {
   ComplianceChecklistResponse,
   WorkerValidationIssue,
@@ -22,6 +22,12 @@ const coverage = ref<JurisdictionCoverage[]>([]);
 const coverageLoadError = ref(false);
 const elapsedSeconds = ref(0);
 const expandedSources = ref<Record<string, boolean>>({});
+const sourceSearchOpen = ref(false);
+const sourceSearchMunicipality = ref('');
+const sourceSearchResults = ref<OfficialSourceCandidate[]>([]);
+const sourceSearchCompletedFor = ref('');
+const sourceSearchPending = ref(false);
+const sourceSearchError = ref('');
 const numberFormatter = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
 const indexFormatter = new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
 const areaLabel = (value: number | null) => value === null ? 'No indicada' : `${numberFormatter.format(value)} m²`;
@@ -90,6 +96,35 @@ const riskBadgeClass = computed(() => {
   }
   return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-100';
 });
+
+const findMunicipalSources = async () => {
+  sourceSearchError.value = '';
+  sourceSearchResults.value = [];
+  sourceSearchCompletedFor.value = '';
+  const municipality = sourceSearchMunicipality.value.trim();
+  if (municipality.length < 3) {
+    sourceSearchError.value = 'Escribe el nombre de un municipio colombiano.';
+    return;
+  }
+  sourceSearchPending.value = true;
+  try {
+    const response = await searchOfficialSources(municipality);
+    sourceSearchResults.value = response.candidates;
+    sourceSearchCompletedFor.value = response.municipality;
+  } catch (error) {
+    sourceSearchError.value = error instanceof Error
+      ? error.message
+      : 'No fue posible buscar fuentes oficiales. Intenta nuevamente.';
+  } finally {
+    sourceSearchPending.value = false;
+  }
+};
+
+const selectDiscoveredMunicipality = () => {
+  if (!sourceSearchCompletedFor.value) return;
+  jurisdiction.value = sourceSearchCompletedFor.value;
+  sourceSearchOpen.value = false;
+};
 
 let validationTimer: number | undefined;
 let submissionTimer: number | undefined;
@@ -217,6 +252,50 @@ onBeforeUnmount(() => {
               <p v-else-if="coverageLoadError" class="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 No se pudo cargar el estado documental. Puedes consultar cuando el backend esté disponible.
               </p>
+              <div class="mt-4 overflow-hidden rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 shadow-sm dark:border-indigo-900/70 dark:from-indigo-950/50 dark:via-slate-900 dark:to-cyan-950/40">
+                <div class="flex items-start gap-3 p-4">
+                  <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/20" aria-hidden="true">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2M8 10.8h5.6M10.8 8v5.6"/></svg>
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">¿Tu municipio no aparece?</h3>
+                    <p class="mt-1 text-xs leading-5 text-slate-600 dark:text-slate-300">Busca documentos de ordenamiento publicados en sitios oficiales colombianos.</p>
+                    <button class="mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" type="button" :aria-expanded="sourceSearchOpen" @click="sourceSearchOpen = !sourceSearchOpen">
+                      {{ sourceSearchOpen ? 'Cerrar búsqueda' : 'Buscar fuentes oficiales' }}
+                    </button>
+                  </div>
+                </div>
+                <div v-if="sourceSearchOpen" class="border-t border-indigo-100 bg-white/80 p-4 dark:border-indigo-900/70 dark:bg-slate-950/40">
+                  <form class="flex flex-col gap-2 sm:flex-row" @submit.prevent="findMunicipalSources">
+                    <label class="sr-only" for="sourceMunicipality">Municipio colombiano</label>
+                    <input id="sourceMunicipality" v-model="sourceSearchMunicipality" class="min-h-11 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-900" maxlength="100" placeholder="Ej. Manizales, Neiva o Popayán" type="text" />
+                    <button class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-400" type="submit" :disabled="sourceSearchPending || sourceSearchMunicipality.trim().length < 3">
+                      <svg v-if="sourceSearchPending" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.37 0 0 5.37 0 12h4Z"/></svg>
+                      {{ sourceSearchPending ? 'Buscando...' : 'Buscar' }}
+                    </button>
+                  </form>
+                  <p v-if="sourceSearchError" class="mt-3 rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs leading-5 text-rose-800 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-200" role="alert">{{ sourceSearchError }}</p>
+                  <p v-if="sourceSearchCompletedFor && sourceSearchResults.length === 0" class="mt-3 rounded-lg bg-slate-50 p-3 text-xs leading-5 text-slate-600 dark:bg-slate-900 dark:text-slate-300" role="status">No encontramos resultados que cumplan los criterios de búsqueda oficial. Prueba con el nombre completo del municipio.</p>
+                  <div v-if="sourceSearchResults.length" class="mt-4 space-y-3" aria-live="polite">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <p class="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Resultados para {{ sourceSearchCompletedFor }}</p>
+                      <button class="min-h-9 rounded-lg border border-indigo-200 px-3 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-200 dark:hover:bg-indigo-950" type="button" @click="selectDiscoveredMunicipality">Usar este municipio</button>
+                    </div>
+                    <article v-for="candidate in sourceSearchResults" :key="candidate.url" class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition hover:border-indigo-200 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-800">
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <h4 class="text-sm font-semibold leading-5 text-slate-900 dark:text-white">{{ candidate.title }}</h4>
+                          <p class="mt-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-300">{{ candidate.issuingHost }} · sitio oficial HTTPS</p>
+                        </div>
+                        <span class="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-800 dark:bg-amber-950 dark:text-amber-200">Por revisar</span>
+                      </div>
+                      <p class="mt-2 line-clamp-3 text-xs leading-5 text-slate-600 dark:text-slate-300">{{ candidate.summary }}</p>
+                      <a class="mt-2 inline-flex min-h-9 items-center gap-1 text-xs font-semibold text-indigo-700 underline underline-offset-2 dark:text-indigo-300" :href="candidate.url" target="_blank" rel="noreferrer">Abrir fuente oficial</a>
+                    </article>
+                    <p class="rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900 dark:bg-amber-950/50 dark:text-amber-100">Son candidatos encontrados en sitios oficiales, no normas verificadas. Deben revisarse e indexarse antes de respaldar respuestas.</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div>
