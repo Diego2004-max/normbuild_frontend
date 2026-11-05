@@ -61,6 +61,7 @@ const projectMetrics = computed(() => {
 const selectedCoverage = computed(() => coverage.value.find(
   (item) => item.jurisdiction.toLocaleLowerCase('es-CO') === jurisdiction.value.trim().toLocaleLowerCase('es-CO'),
 ));
+const municipalCoverage = computed(() => coverage.value.filter((item) => item.jurisdiction !== 'Colombia'));
 const nationalCoverage = computed(() => coverage.value.find((item) => item.jurisdiction === 'Colombia'));
 const sourcePreview = (content: string) => {
   if (content.length <= 360) return content;
@@ -281,16 +282,16 @@ onBeforeUnmount(() => {
                 type="text"
               />
               <datalist id="jurisdiction-options">
-                <option v-for="item in coverage" :key="item.jurisdiction" :value="item.jurisdiction" />
+                <option v-for="item in municipalCoverage" :key="item.jurisdiction" :value="item.jurisdiction" />
               </datalist>
               <p v-if="selectedCoverage?.status === 'AVAILABLE'" class="mt-2 text-xs text-emerald-700 dark:text-emerald-300" role="status">
                 {{ selectedCoverage.officialSources }} fuentes locales indexadas · {{ selectedCoverage.indexedSections }} secciones. {{ nationalCoverage?.officialSources ?? 0 }} fuentes nacionales disponibles.
               </p>
               <p v-else-if="selectedCoverage?.status === 'NO_OFFICIAL_SOURCE'" class="mt-2 text-xs text-amber-800 dark:text-amber-200" role="status">
-                Aún no hay fuentes locales indexadas para esta ciudad. {{ nationalCoverage?.officialSources ?? 0 }} fuentes nacionales disponibles; no reemplazan el POT ni los mapas del predio.
+                Aún no hay fuentes locales indexadas. Al consultar, la IA buscará extractos oficiales recientes para esta ciudad; su vigencia y aplicación al predio deben verificarse. La descripción del proyecto no se envía al buscador externo.
               </p>
               <p v-else-if="nationalCoverage?.officialSources" class="mt-2 text-xs text-slate-600 dark:text-slate-300" role="status">
-                Hay {{ nationalCoverage.officialSources }} fuentes nacionales indexadas; no se encontró cobertura local confirmada para este nombre.
+                No hay cobertura local confirmada para este municipio. Al consultar, la IA buscará extractos oficiales recientes; la búsqueda externa solo recibe el nombre de la ciudad y términos generales.
               </p>
               <p v-else-if="coverageLoadError" class="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 No se pudo cargar el estado documental. Puedes consultar cuando el backend esté disponible.
@@ -436,6 +437,9 @@ onBeforeUnmount(() => {
             <p v-if="answer.generationMode === 'UNAVAILABLE'" class="border-l-4 border-red-500 bg-red-50 p-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-100" role="alert">
               {{ answer.answer }}
             </p>
+            <p v-if="answer.generationMode === 'WEB_RESEARCH'" class="border-l-4 border-amber-500 bg-amber-50 p-3 text-sm leading-6 text-amber-950 dark:bg-amber-950/60 dark:text-amber-100" role="status">
+              La IA consultó extractos recientes de páginas oficiales para esta ciudad. Son orientación preliminar: revisa la vigencia de cada norma y la ficha y cartografía del predio. La búsqueda externa recibe el municipio y términos generales; la descripción de tu proyecto se procesa en el modelo local.
+            </p>
             <article v-if="answer.answer && answer.generationMode !== 'UNAVAILABLE'" class="prose prose-slate max-w-none whitespace-pre-line rounded-md bg-slate-50 p-4 text-sm leading-6 dark:prose-invert dark:bg-slate-950">
               {{ answer.answer }}
             </article>
@@ -458,7 +462,10 @@ onBeforeUnmount(() => {
                         Consultar fuente oficial
                       </a>
                     </div>
-                    <span class="shrink-0 text-sm font-semibold text-civic-green dark:text-emerald-300" title="Similitud de búsqueda, no porcentaje de cumplimiento">
+                    <span v-if="citation.sourceType === 'LIVE_WEB'" class="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+                      Fuente web por verificar
+                    </span>
+                    <span v-else class="shrink-0 text-sm font-semibold text-civic-green dark:text-emerald-300" title="Similitud de búsqueda, no porcentaje de cumplimiento">
                       {{ Math.round(citation.similarity * 100) }}%
                     </span>
                   </div>
