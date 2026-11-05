@@ -34,16 +34,16 @@ test('preserves the Spanish API error when source discovery is unavailable', asy
   await assert.rejects(client.search('Neiva'), /no está configurada/);
 });
 
-test('sends the administrative key only with an explicitly confirmed PDF import', async () => {
+test('sends the administrative key only with an explicitly confirmed official source import', async () => {
   let request;
   const client = createOfficialSourceClient('/api-root', async (url, options) => {
     request = { url, options };
     return Response.json({ sourceDocumentId: 'document-1', indexedChunks: 24, status: 'INDEXED' }, { status: 202 });
   });
 
-  const result = await client.importPdf('Neiva', candidate, 'Acuerdo 001 de 2024', 'private-key');
+  const result = await client.importSource('Neiva', candidate, 'Acuerdo 001 de 2024', 'private-key');
 
-  assert.equal(request.url, '/api-root/api/regulations/documents/pdf/from-official-url');
+  assert.equal(request.url, '/api-root/api/regulations/documents/from-official-url');
   assert.equal(request.options.headers['X-NormBuild-Ingestion-Key'], 'private-key');
   assert.equal(request.options.signal instanceof AbortSignal, true);
   assert.equal(request.options.signal.aborted, false);
@@ -57,13 +57,13 @@ test('sends the administrative key only with an explicitly confirmed PDF import'
   assert.equal(result.indexedChunks, 24);
 });
 
-test('shows a Spanish timeout message when official PDF indexing takes too long', async () => {
+test('shows a Spanish timeout message when official source indexing takes too long', async () => {
   const client = createOfficialSourceClient('', async () => {
     throw new DOMException('Timed out', 'TimeoutError');
   });
 
   await assert.rejects(
-    client.importPdf('Neiva', candidate, 'Acuerdo 001 de 2024', 'private-key'),
+    client.importSource('Neiva', candidate, 'Acuerdo 001 de 2024', 'private-key'),
     /La incorporación tardó demasiado/,
   );
 });

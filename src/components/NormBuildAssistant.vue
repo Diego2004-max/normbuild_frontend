@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { fetchJurisdictionCoverage, importOfficialPdfSource, requestComplianceChecklist, searchOfficialSources } from '../services/regulationApi';
+import { fetchJurisdictionCoverage, importOfficialSource, requestComplianceChecklist, searchOfficialSources } from '../services/regulationApi';
 import type { JurisdictionCoverage, OfficialSourceCandidate } from '../services/regulationApi';
 import type {
   ComplianceChecklistResponse,
@@ -148,7 +148,7 @@ const importReviewedSource = async () => {
   sourceImportError.value = '';
   sourceImportSuccess.value = '';
   try {
-    const result = await importOfficialPdfSource(
+    const result = await importOfficialSource(
       sourceSearchCompletedFor.value, candidate, sourceImportCode.value.trim(), sourceImportKey.value,
     );
     sourceImportSuccess.value = `Documento incorporado: ${result.indexedChunks} secciones indexadas. Ya puedes consultar esta jurisdicción.`;
@@ -162,7 +162,7 @@ const importReviewedSource = async () => {
   } catch (error) {
     sourceImportError.value = error instanceof Error
       ? error.message
-      : 'No fue posible incorporar el documento. Verifica la clave, el PDF y la conexión.';
+      : 'No fue posible incorporar la fuente. Verifica la clave, el documento o página oficial y la conexión.';
   } finally {
     sourceImportPending.value = false;
     sourceImportKey.value = '';
@@ -335,7 +335,7 @@ onBeforeUnmount(() => {
                       <p class="mt-2 line-clamp-3 text-xs leading-5 text-slate-600 dark:text-slate-300">{{ candidate.summary }}</p>
                       <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
                         <a class="inline-flex min-h-9 items-center gap-1 text-xs font-semibold text-indigo-700 underline underline-offset-2 dark:text-indigo-300" :href="candidate.url" target="_blank" rel="noreferrer">Abrir fuente oficial</a>
-                        <button class="min-h-9 text-xs font-semibold text-slate-700 underline underline-offset-2 hover:text-indigo-700 dark:text-slate-200 dark:hover:text-indigo-300" type="button" @click="prepareSourceImport(candidate)">Revisar e incorporar PDF</button>
+                        <button class="min-h-9 text-xs font-semibold text-slate-700 underline underline-offset-2 hover:text-indigo-700 dark:text-slate-200 dark:hover:text-indigo-300" type="button" @click="prepareSourceImport(candidate)">Revisar e incorporar fuente</button>
                       </div>
                     </article>
                     <p class="rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900 dark:bg-amber-950/50 dark:text-amber-100">Son candidatos encontrados en sitios oficiales, no normas verificadas. Deben revisarse e indexarse antes de respaldar respuestas.</p>
@@ -355,13 +355,13 @@ onBeforeUnmount(() => {
                     </div>
                     <label class="flex items-start gap-2 text-xs leading-5 text-slate-700 dark:text-slate-200">
                       <input v-model="sourceImportConfirmed" required type="checkbox" class="mt-0.5 h-4 w-4 shrink-0 accent-indigo-600" />
-                      Confirmo que revisé en la fuente oficial la vigencia, modificaciones, anexos y jurisdicción de esta norma. Entiendo que la carga solo acepta PDF oficial con texto seleccionable.
+                      Confirmo que revisé en la fuente oficial la vigencia, modificaciones, anexos y jurisdicción de esta norma. Se incorporará el texto de un PDF oficial seleccionable o de una página HTML oficial.
                     </label>
                     <p v-if="sourceImportError" class="rounded-lg bg-rose-100 p-3 text-xs text-rose-900 dark:bg-rose-950 dark:text-rose-100" role="alert">{{ sourceImportError }}</p>
                     <p v-if="sourceImportSuccess" class="rounded-lg bg-emerald-100 p-3 text-xs text-emerald-900 dark:bg-emerald-950 dark:text-emerald-100" role="status">{{ sourceImportSuccess }}</p>
                     <div class="flex flex-wrap gap-2">
                       <button class="min-h-10 rounded-lg bg-indigo-600 px-4 text-xs font-bold text-white hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60" type="submit" :disabled="sourceImportPending || !sourceImportConfirmed || !sourceImportKey || sourceImportCode.trim().length < 3">
-                        {{ sourceImportPending ? 'Validando e indexando PDF...' : 'Confirmar e agregar al índice' }}
+                        {{ sourceImportPending ? 'Validando e indexando fuente...' : 'Confirmar y agregar al índice' }}
                       </button>
                       <button class="min-h-10 rounded-lg border border-slate-300 px-4 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:text-slate-200" type="button" :disabled="sourceImportPending" @click="sourceImportCandidate = null; sourceImportKey = ''">Cancelar</button>
                     </div>

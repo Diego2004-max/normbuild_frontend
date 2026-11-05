@@ -24,7 +24,7 @@ interface ApiErrorResponse {
 
 export interface OfficialSourceClient {
   search(municipality: string): Promise<OfficialSourceSearchResponse>;
-  importPdf(
+  importSource(
     municipality: string,
     candidate: OfficialSourceCandidate,
     regulationCode: string,
@@ -59,8 +59,8 @@ export const createOfficialSourceClient = (apiBaseUrl = '', fetcher: Fetcher = f
     return response.json() as Promise<OfficialSourceSearchResponse>;
   },
 
-  async importPdf(municipality, candidate, regulationCode, ingestionKey) {
-    const response = await request(fetcher, `${apiBaseUrl}/api/regulations/documents/pdf/from-official-url`, {
+  async importSource(municipality, candidate, regulationCode, ingestionKey) {
+    const response = await request(fetcher, `${apiBaseUrl}/api/regulations/documents/from-official-url`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

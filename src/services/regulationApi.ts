@@ -30,12 +30,12 @@ export const fetchJurisdictionCoverage = async (): Promise<JurisdictionCoverage[
 
 export const searchOfficialSources = (municipality: string) => officialSourceClient.search(municipality);
 
-export const importOfficialPdfSource = (
+export const importOfficialSource = (
   municipality: string,
   candidate: OfficialSourceCandidate,
   regulationCode: string,
   ingestionKey: string,
-)=> officialSourceClient.importPdf(municipality, candidate, regulationCode, ingestionKey);
+)=> officialSourceClient.importSource(municipality, candidate, regulationCode, ingestionKey);
 
 interface ApiErrorResponse {
   message?: string;
