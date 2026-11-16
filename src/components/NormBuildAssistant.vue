@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { fetchJurisdictionCoverage, importOfficialSource, requestComplianceChecklist, searchOfficialSources } from '../services/regulationApi';
+import { findConflictingJurisdiction } from '../services/jurisdictionMismatch';
 import type { JurisdictionCoverage, OfficialSourceCandidate } from '../services/regulationApi';
 import type {
   ComplianceChecklistResponse,
@@ -76,11 +77,15 @@ const validationWorker = new Worker(new URL('../workers/regulationWorker.ts', im
 });
 
 const hasValidationErrors = computed(() => validationIssues.value.length > 0);
+const conflictingJurisdiction = computed(() => findConflictingJurisdiction(
+  jurisdiction.value, projectDescription.value, municipalCoverage.value.map((item) => item.jurisdiction),
+));
 const canSubmit = computed(
   () =>
     !isValidating.value &&
     !isSubmitting.value &&
     !hasValidationErrors.value &&
+    !conflictingJurisdiction.value &&
     formattedDescription.value.length > 0,
 );
 const statusLabel = computed(() => {
@@ -394,6 +399,9 @@ onBeforeUnmount(() => {
             <div v-if="validationIssues.length" class="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100">
               <p v-for="issue in validationIssues" :key="issue.field + issue.message">{{ issue.message }}</p>
             </div>
+            <p v-if="conflictingJurisdiction" class="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100" role="alert">
+              La descripción menciona {{ conflictingJurisdiction }}, pero seleccionaste {{ jurisdiction }}. Corrige la jurisdicción antes de consultar.
+            </p>
 
             <p v-if="requestError" class="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-100">
               {{ requestError }}
