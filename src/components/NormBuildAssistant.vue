@@ -3,6 +3,9 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { fetchJurisdictionCoverage, importOfficialSource, requestComplianceChecklist, searchOfficialSources } from '../services/regulationApi';
 import { findConflictingJurisdiction } from '../services/jurisdictionMismatch';
 import { sourcePreview } from '../services/sourcePreview';
+import AccountPanel from './AccountPanel.vue';
+import { importAdminSource, requestSavedChecklist } from '../services/accountApi';
+import type { AccountProfile } from '../services/accountApi';
 import type { JurisdictionCoverage, OfficialSourceCandidate } from '../services/regulationApi';
 import type {
   ComplianceChecklistResponse,
@@ -16,6 +19,8 @@ const isDarkMode = ref(false);
 const isValidating = ref(false);
 const isSubmitting = ref(false);
 const answer = ref<ComplianceChecklistResponse | null>(null);
+const accountProfile = ref<AccountProfile | null>(null);
+const historyRefreshKey = ref(0);
 const validationIssues = ref<WorkerValidationIssue[]>([]);
 const formattedDescription = ref('');
 const wordCount = ref(0);
@@ -143,14 +148,15 @@ const prepareSourceImport = (candidate: OfficialSourceCandidate) => {
 
 const importReviewedSource = async () => {
   const candidate = sourceImportCandidate.value;
-  if (!candidate || !sourceSearchCompletedFor.value || !sourceImportKey.value || !sourceImportConfirmed.value) return;
+  if (!candidate || !sourceSearchCompletedFor.value || !sourceImportConfirmed.value
+      || (accountProfile.value?.role !== 'ADMIN' && !sourceImportKey.value)) return;
   sourceImportPending.value = true;
   sourceImportError.value = '';
   sourceImportSuccess.value = '';
   try {
-    const result = await importOfficialSource(
-      sourceSearchCompletedFor.value, candidate, sourceImportCode.value.trim(), sourceImportKey.value,
-    );
+    const result = accountProfile.value?.role === 'ADMIN'
+      ? await importAdminSource(sourceSearchCompletedFor.value, candidate, sourceImportCode.value.trim())
+      : await importOfficialSource(sourceSearchCompletedFor.value, candidate, sourceImportCode.value.trim(), sourceImportKey.value);
     sourceImportSuccess.value = `Documento incorporado: ${result.indexedChunks} secciones indexadas. Ya puedes consultar esta jurisdicción.`;
     sourceImportKey.value = '';
     jurisdiction.value = sourceSearchCompletedFor.value;
@@ -226,12 +232,16 @@ const submitQuery = async () => {
     elapsedSeconds.value = Math.floor((Date.now() - startedAt) / 1000);
   }, 1000);
   try {
-    answer.value = await requestComplianceChecklist({
+    const query = {
       jurisdiction: jurisdiction.value.trim(),
       projectDescription: formattedDescription.value,
-    }, (progress) => {
-      answer.value = progress;
-    });
+    };
+    answer.value = accountProfile.value
+      ? await requestSavedChecklist(query, (progress) => { answer.value = progress; })
+      : await requestComplianceChecklist(query, (progress) => {
+        answer.value = progress;
+      });
+    if (accountProfile.value) historyRefreshKey.value += 1;
   } catch (error) {
     requestError.value =
       error instanceof Error
@@ -241,6 +251,14 @@ const submitQuery = async () => {
     window.clearInterval(submissionTimer);
     isSubmitting.value = false;
   }
+};
+
+const restoreQuery = (savedJurisdiction: string, description: string) => {
+  jurisdiction.value = savedJurisdiction;
+  projectDescription.value = description;
+  answer.value = null;
+  requestError.value = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 onBeforeUnmount(() => {
@@ -266,6 +284,7 @@ onBeforeUnmount(() => {
           <input v-model="isDarkMode" class="h-5 w-5 accent-civic-blue" type="checkbox" />
         </label>
       </header>
+      <AccountPanel v-model:profile="accountProfile" :refresh-key="historyRefreshKey" @restore="restoreQuery" />
 
       <div class="grid flex-1 gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <section class="rounded-md bg-white p-5 shadow-panel dark:bg-slate-900">
@@ -356,7 +375,7 @@ onBeforeUnmount(() => {
                       <label class="block text-xs font-semibold text-slate-700 dark:text-slate-200">Norma o acto administrativo
                         <input v-model="sourceImportCode" required maxlength="80" class="mt-1 min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal dark:border-slate-700 dark:bg-slate-900" placeholder="Acuerdo 001 de 2024" />
                       </label>
-                      <label class="block text-xs font-semibold text-slate-700 dark:text-slate-200">Clave administrativa de incorporación
+                      <label v-if="accountProfile?.role !== 'ADMIN'" class="block text-xs font-semibold text-slate-700 dark:text-slate-200">Clave administrativa de incorporación
                         <input v-model="sourceImportKey" required type="password" autocomplete="new-password" class="mt-1 min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal dark:border-slate-700 dark:bg-slate-900" placeholder="Se borra al terminar" />
                       </label>
                     </div>
@@ -367,7 +386,7 @@ onBeforeUnmount(() => {
                     <p v-if="sourceImportError" class="rounded-lg bg-rose-100 p-3 text-xs text-rose-900 dark:bg-rose-950 dark:text-rose-100" role="alert">{{ sourceImportError }}</p>
                     <p v-if="sourceImportSuccess" class="rounded-lg bg-emerald-100 p-3 text-xs text-emerald-900 dark:bg-emerald-950 dark:text-emerald-100" role="status">{{ sourceImportSuccess }}</p>
                     <div class="flex flex-wrap gap-2">
-                      <button class="min-h-10 rounded-lg bg-indigo-600 px-4 text-xs font-bold text-white hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60" type="submit" :disabled="sourceImportPending || !sourceImportConfirmed || !sourceImportKey || sourceImportCode.trim().length < 3">
+                      <button class="min-h-10 rounded-lg bg-indigo-600 px-4 text-xs font-bold text-white hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60" type="submit" :disabled="sourceImportPending || !sourceImportConfirmed || (accountProfile?.role !== 'ADMIN' && !sourceImportKey) || sourceImportCode.trim().length < 3">
                         {{ sourceImportPending ? 'Validando e indexando fuente...' : 'Confirmar y agregar al índice' }}
                       </button>
                       <button class="min-h-10 rounded-lg border border-slate-300 px-4 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:text-slate-200" type="button" :disabled="sourceImportPending" @click="sourceImportCandidate = null; sourceImportKey = ''">Cancelar</button>
