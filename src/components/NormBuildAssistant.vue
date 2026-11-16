@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { fetchJurisdictionCoverage, importOfficialSource, requestComplianceChecklist, searchOfficialSources } from '../services/regulationApi';
 import { findConflictingJurisdiction } from '../services/jurisdictionMismatch';
+import { sourcePreview } from '../services/sourcePreview';
 import type { JurisdictionCoverage, OfficialSourceCandidate } from '../services/regulationApi';
 import type {
   ComplianceChecklistResponse,
@@ -64,13 +65,6 @@ const selectedCoverage = computed(() => coverage.value.find(
 ));
 const municipalCoverage = computed(() => coverage.value.filter((item) => item.jurisdiction !== 'Colombia'));
 const nationalCoverage = computed(() => coverage.value.find((item) => item.jurisdiction === 'Colombia'));
-const sourcePreview = (content: string) => {
-  if (content.length <= 360) return content;
-  const firstSentence = content.match(/^.*?[.!?](?:\s|$)/s)?.[0];
-  if (firstSentence && firstSentence.length <= 360) return firstSentence.trim();
-  const prefix = content.slice(0, 360);
-  return `${prefix.slice(0, prefix.lastIndexOf(' ')).trim()}...`;
-};
 
 const validationWorker = new Worker(new URL('../workers/regulationWorker.ts', import.meta.url), {
   type: 'module',
