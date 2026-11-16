@@ -480,8 +480,8 @@ onBeforeUnmount(() => {
                     <span v-if="citation.sourceType === 'LIVE_WEB'" class="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-950 dark:text-amber-100">
                       Fuente web por verificar
                     </span>
-                    <span v-else class="shrink-0 text-sm font-semibold text-civic-green dark:text-emerald-300" title="Similitud de búsqueda, no porcentaje de cumplimiento">
-                      {{ Math.round(citation.similarity * 100) }}%
+                    <span v-else class="shrink-0 text-sm font-semibold text-civic-green dark:text-emerald-300" :title="citation.similarity > 0 ? 'Similitud de búsqueda, no porcentaje de cumplimiento' : 'Fuente recuperada del índice oficial'">
+                      {{ citation.similarity > 0 ? `${Math.round(citation.similarity * 100)}%` : 'Fuente indexada' }}
                     </span>
                   </div>
                   <p class="mt-3 whitespace-pre-line break-words text-sm leading-6 text-slate-600 dark:text-slate-300">{{ expandedSources[citation.id] ? citation.excerpt : sourcePreview(citation.excerpt) }}</p>
