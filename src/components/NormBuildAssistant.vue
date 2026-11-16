@@ -193,6 +193,13 @@ validationWorker.onmessage = (event: MessageEvent<WorkerValidationResult>) => {
 
 watch([jurisdiction, projectDescription], runValidation, { immediate: true });
 
+watch(jurisdiction, () => {
+  if (!isSubmitting.value) {
+    answer.value = null;
+    requestError.value = '';
+  }
+});
+
 onMounted(async () => {
   try {
     coverage.value = await fetchJurisdictionCoverage();
@@ -438,7 +445,7 @@ onBeforeUnmount(() => {
               {{ answer.answer }}
             </p>
             <p v-if="answer.generationMode === 'WEB_RESEARCH'" class="border-l-4 border-amber-500 bg-amber-50 p-3 text-sm leading-6 text-amber-950 dark:bg-amber-950/60 dark:text-amber-100" role="status">
-              La IA consultó extractos recientes de páginas oficiales para esta ciudad. Son orientación preliminar: revisa la vigencia de cada norma y la ficha y cartografía del predio. La búsqueda externa recibe el municipio y términos generales; la descripción de tu proyecto se procesa en el modelo local.
+              La IA combinó las fuentes oficiales indexadas disponibles con extractos recientes de sitios oficiales. Verifica la vigencia de cada norma y la ficha y cartografía del predio. La búsqueda externa recibe solo el municipio y términos generales; la descripción del proyecto se procesa en el modelo local.
             </p>
             <article v-if="answer.answer && answer.generationMode !== 'UNAVAILABLE'" class="prose prose-slate max-w-none whitespace-pre-line rounded-md bg-slate-50 p-4 text-sm leading-6 dark:prose-invert dark:bg-slate-950">
               {{ answer.answer }}
