@@ -69,3 +69,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 065. **Bucaramanga / progress:** A checklist request shows streamed progress and elapsed time while the backend is working.
 066. **Bucaramanga / calculation:** Proposed area ratios are displayed separately from unverified legal maximums.
 067. **Bucaramanga / citations:** Every cited source offers an external link and expandable excerpt without clipping substantive text.
+068. **Bucaramanga / account:** A citizen can register or sign in and sees only the account role assigned by the server.
