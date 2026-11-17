@@ -100,3 +100,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 096. **Cartagena / account:** A citizen can register or sign in and sees only the account role assigned by the server.
 097. **Cartagena / history:** A signed-in citizen can revisit and delete only personal saved queries.
 098. **Cartagena / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
+099. **Manizales / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
