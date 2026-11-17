@@ -18,9 +18,9 @@ export interface QueryHistoryItem {
   createdAt: string;
 }
 
-const request = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
+const request = async <T>(path: string, options: RequestInit = {}, timeoutMs = 75_000): Promise<T> => {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 4_000);
+  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await fetch(`/api/account${path}`, {
       ...options,
@@ -34,12 +34,17 @@ const request = async <T>(path: string, options: RequestInit = {}): Promise<T> =
     }
     if (response.status === 204) return undefined as T;
     return response.json() as Promise<T>;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error('El servidor está tardando en iniciar. Espera unos segundos e inténtalo nuevamente.');
+    }
+    throw error;
   } finally {
     window.clearTimeout(timeout);
   }
 };
 
-export const getAccount = async () => (await request<AccountProfile | undefined>('/me')) ?? null;
+export const getAccount = async () => (await request<AccountProfile | undefined>('/me', {}, 4_000)) ?? null;
 export const getGoogleConfig = () => request<{ clientId: string }>('/google/config');
 export const loginWithGoogle = (credential: string) => request<AccountProfile>('/google', {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ credential }),
