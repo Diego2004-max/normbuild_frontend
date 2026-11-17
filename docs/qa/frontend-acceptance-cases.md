@@ -79,3 +79,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 075. **Barranquilla / source-review:** A discovered source is labeled pending review until an administrator confirms and imports it.
 076. **Barranquilla / worker:** The document worker normalizes a multiline project description without freezing text input.
 077. **Barranquilla / validation:** A short or empty project description shows a Spanish validation message and disables submission.
+078. **Barranquilla / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
