@@ -6,3 +6,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 002. **Bogota D.C. / coverage:** The coverage status reflects the API result, including source count and section count when available.
 003. **Bogota D.C. / missing-coverage:** When coverage is absent, the interface explains the limitation without claiming that a legal rule was found.
 004. **Bogota D.C. / discovery:** Source discovery displays official HTTPS candidates for the selected municipality.
+005. **Bogota D.C. / source-review:** A discovered source is labeled pending review until an administrator confirms and imports it.
