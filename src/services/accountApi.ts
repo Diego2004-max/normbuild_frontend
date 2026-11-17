@@ -32,7 +32,7 @@ const request = async <T>(path: string, options: RequestInit = {}): Promise<T> =
   return response.json() as Promise<T>;
 };
 
-export const getAccount = () => request<AccountProfile>('/me');
+export const getAccount = async () => (await request<AccountProfile | undefined>('/me')) ?? null;
 export const getGoogleConfig = () => request<{ clientId: string }>('/google/config');
 export const loginWithGoogle = (credential: string) => request<AccountProfile>('/google', {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ credential }),
