@@ -65,3 +65,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 061. **Bucaramanga / source-review:** A discovered source is labeled pending review until an administrator confirms and imports it.
 062. **Bucaramanga / worker:** The document worker normalizes a multiline project description without freezing text input.
 063. **Bucaramanga / validation:** A short or empty project description shows a Spanish validation message and disables submission.
+064. **Bucaramanga / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
