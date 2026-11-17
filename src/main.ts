@@ -23,7 +23,7 @@ const router = createRouter({
 
 router.beforeEach(async (target) => {
   if (target.path === '/acceder') {
-    void initializeAccountSession();
+    void initializeAccountSession().catch(() => undefined);
     return true;
   }
   await initializeAccountSession();
