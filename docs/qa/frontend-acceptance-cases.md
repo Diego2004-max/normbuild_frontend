@@ -44,3 +44,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 040. **Medellin / account:** A citizen can register or sign in and sees only the account role assigned by the server.
 041. **Medellin / history:** A signed-in citizen can revisit and delete only personal saved queries.
 042. **Medellin / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
+043. **Cali / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
