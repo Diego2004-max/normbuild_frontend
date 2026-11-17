@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import NormBuildAssistant from './components/NormBuildAssistant.vue';
+import { onMounted } from 'vue';
+import { RouterView } from 'vue-router';
+import { initializeAccountSession } from './services/accountSession';
+
+onMounted(initializeAccountSession);
 </script>
 
 <template>
-  <NormBuildAssistant />
+  <RouterView />
 </template>

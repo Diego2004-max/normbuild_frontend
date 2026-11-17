@@ -4,6 +4,10 @@
     {
       "source": "/api/account/:path*",
       "destination": "https://normbuild-api.onrender.com/api/account/:path*"
+    },
+    {
+      "source": "/cuenta",
+      "destination": "/index.html"
     }
   ]
 }
