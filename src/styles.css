@@ -68,6 +68,11 @@ body {
 }
 
 .account-link:hover { transform: translateY(-1px); border-color: #5eead4; box-shadow: 0 8px 20px rgb(13 148 136 / 0.12); }
+.signout-link { border-color: #fecaca; color: #b91c1c; }
+.signout-link:hover { border-color: #f87171; background: #fef2f2; box-shadow: 0 8px 20px rgb(220 38 38 / 0.10); }
+.signout-link:disabled { cursor: wait; opacity: 0.6; }
+.dark .signout-link { border-color: rgb(127 29 29 / 0.8); color: #fecaca; background: rgb(69 10 10 / 0.35); }
+.dark .signout-link:hover { border-color: #b91c1c; background: rgb(69 10 10 / 0.6); }
 .theme-switch { cursor: pointer; color: #334155; }
 .dark .account-link, .dark .theme-switch { border-color: #26364b; background: rgb(15 23 42 / 0.8); color: #dbeafe; }
 .theme-track { position: relative; width: 2.25rem; height: 1.25rem; border-radius: 9999px; background: #cbd5e1; transition: 180ms ease; }

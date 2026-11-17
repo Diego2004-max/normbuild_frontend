@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { fetchJurisdictionCoverage, importOfficialSource, requestComplianceChecklist, searchOfficialSources } from '../services/regulationApi';
 import { findConflictingJurisdiction } from '../services/jurisdictionMismatch';
 import { sourcePreview } from '../services/sourcePreview';
-import { importAdminSource, requestSavedChecklist } from '../services/accountApi';
+import { importAdminSource, logoutAccount, requestSavedChecklist } from '../services/accountApi';
 import { accountProfile, restoredDraft } from '../services/accountSession';
 import type { JurisdictionCoverage, OfficialSourceCandidate } from '../services/regulationApi';
 import type {
@@ -13,6 +14,8 @@ import type {
 } from '../types/regulation';
 
 const jurisdiction = ref('Bogotá D.C.');
+const router = useRouter();
+const signOutPending = ref(false);
 const projectDescription = ref('');
 const isDarkMode = ref(false);
 const isValidating = ref(false);
@@ -40,6 +43,17 @@ const sourceImportPending = ref(false);
 const sourceImportError = ref('');
 const sourceImportSuccess = ref('');
 const numberFormatter = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
+
+const signOut = async () => {
+  signOutPending.value = true;
+  try {
+    await logoutAccount();
+    accountProfile.value = null;
+    await router.replace('/acceder');
+  } finally {
+    signOutPending.value = false;
+  }
+};
 const indexFormatter = new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
 const areaLabel = (value: number | null) => value === null ? 'No indicada' : `${numberFormatter.format(value)} m²`;
 const projectMetrics = computed(() => {
@@ -278,6 +292,10 @@ onBeforeUnmount(() => {
           <RouterLink to="/cuenta" class="account-link">
             {{ accountProfile ? 'Mi cuenta e historial' : 'Iniciar sesión' }}
           </RouterLink>
+          <button v-if="accountProfile" class="account-link signout-link" type="button" :disabled="signOutPending" @click="signOut">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
+            {{ signOutPending ? 'Cerrando...' : 'Cerrar sesión' }}
+          </button>
           <label class="theme-switch">
             <span>{{ isDarkMode ? 'Modo oscuro' : 'Modo claro' }}</span>
             <input v-model="isDarkMode" class="peer sr-only" type="checkbox" />
