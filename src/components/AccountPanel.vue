@@ -100,7 +100,10 @@ const removeItem = async (id: string) => {
     <div v-else class="mt-4">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <p class="break-all text-sm">{{ accountProfile.email }}</p>
-        <button class="text-sm font-semibold text-civic-blue underline dark:text-sky-300" type="button" :disabled="pending" @click="signOut">Cerrar sesión</button>
+        <button class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-700 shadow-sm transition hover:-translate-y-0.5 hover:border-red-300 hover:bg-red-100 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 dark:border-red-900/80 dark:bg-red-950/50 dark:text-red-200 dark:hover:bg-red-950" type="button" :disabled="pending" @click="signOut">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
+          {{ pending ? 'Cerrando sesión...' : 'Cerrar sesión' }}
+        </button>
       </div>
       <h3 class="mt-5 text-sm font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">Consultas guardadas</h3>
       <p v-if="history.length === 0" class="mt-2 text-sm text-slate-500">Aún no hay consultas guardadas.</p>
