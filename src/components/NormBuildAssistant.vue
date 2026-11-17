@@ -262,9 +262,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="min-h-screen bg-civic-mist text-civic-ink transition-colors dark:bg-slate-950 dark:text-slate-100">
-    <section class="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-      <header class="flex flex-col gap-4 border-b border-white/70 pb-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
+  <main class="workspace-shell min-h-screen text-civic-ink transition-colors dark:text-slate-100">
+    <div class="workspace-orb workspace-orb-one" aria-hidden="true" />
+    <div class="workspace-orb workspace-orb-two" aria-hidden="true" />
+    <section class="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+      <header class="workspace-header flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p class="text-sm font-semibold uppercase tracking-wide text-civic-green dark:text-emerald-300">NormBuild</p>
           <h1 class="mt-1 text-3xl font-bold text-civic-ink dark:text-white">Asistente de normativa urbanística</h1>
@@ -273,21 +275,22 @@ onBeforeUnmount(() => {
           </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
-          <RouterLink to="/cuenta" class="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-civic-blue shadow-sm transition hover:border-civic-blue dark:border-slate-700 dark:bg-slate-900 dark:text-sky-300">
+          <RouterLink to="/cuenta" class="account-link">
             {{ accountProfile ? 'Mi cuenta e historial' : 'Iniciar sesión' }}
           </RouterLink>
-          <label class="flex items-center gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-medium shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <span>Modo oscuro</span>
-            <input v-model="isDarkMode" class="h-5 w-5 accent-civic-blue" type="checkbox" />
+          <label class="theme-switch">
+            <span>{{ isDarkMode ? 'Modo oscuro' : 'Modo claro' }}</span>
+            <input v-model="isDarkMode" class="peer sr-only" type="checkbox" />
+            <span class="theme-track" aria-hidden="true"><span class="theme-thumb" /></span>
           </label>
         </div>
       </header>
 
-      <div class="grid flex-1 gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        <section class="rounded-md bg-white p-5 shadow-panel dark:bg-slate-900">
+      <div class="grid flex-1 items-start gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <section class="workspace-card workspace-query-card p-5 sm:p-6">
           <div class="mb-5 flex items-center justify-between gap-3">
             <h2 class="text-xl font-semibold">Consulta del proyecto</h2>
-            <span class="rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+            <span class="status-chip">
               {{ statusLabel }}
             </span>
           </div>
@@ -427,7 +430,7 @@ onBeforeUnmount(() => {
           </form>
         </section>
 
-        <section class="rounded-md bg-white p-5 shadow-panel dark:bg-slate-900">
+        <section class="workspace-card workspace-result-card p-5 sm:p-6">
           <div class="mb-5 flex items-center justify-between gap-3">
             <h2 class="text-xl font-semibold">Resultado normativo</h2>
             <span class="rounded-md px-3 py-1 text-xs font-bold" :class="riskBadgeClass">
@@ -503,7 +506,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div v-else class="flex min-h-96 items-center justify-center rounded-md border border-dashed border-slate-300 px-6 text-center text-sm leading-6 text-slate-500 dark:border-slate-700 dark:text-slate-300">
+          <div v-else class="result-empty flex min-h-[34rem] items-center justify-center px-6 text-center text-sm leading-6 text-slate-500 dark:text-slate-300">
             Completa la consulta para recibir un checklist con artículos citados, nivel de riesgo y evidencia requerida.
           </div>
         </section>
