@@ -16,3 +16,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 012. **Bogota D.C. / account:** A citizen can register or sign in and sees only the account role assigned by the server.
 013. **Bogota D.C. / history:** A signed-in citizen can revisit and delete only personal saved queries.
 014. **Bogota D.C. / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
+015. **Pasto / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
