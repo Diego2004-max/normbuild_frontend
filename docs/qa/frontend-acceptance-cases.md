@@ -46,3 +46,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 042. **Medellin / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
 043. **Cali / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
 044. **Cali / coverage:** The coverage status reflects the API result, including source count and section count when available.
+045. **Cali / missing-coverage:** When coverage is absent, the interface explains the limitation without claiming that a legal rule was found.
