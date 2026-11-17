@@ -106,3 +106,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 102. **Manizales / discovery:** Source discovery displays official HTTPS candidates for the selected municipality.
 103. **Manizales / source-review:** A discovered source is labeled pending review until an administrator confirms and imports it.
 104. **Manizales / worker:** The document worker normalizes a multiline project description without freezing text input.
+105. **Manizales / validation:** A short or empty project description shows a Spanish validation message and disables submission.
