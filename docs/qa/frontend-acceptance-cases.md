@@ -14,3 +14,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 010. **Bogota D.C. / calculation:** Proposed area ratios are displayed separately from unverified legal maximums.
 011. **Bogota D.C. / citations:** Every cited source offers an external link and expandable excerpt without clipping substantive text.
 012. **Bogota D.C. / account:** A citizen can register or sign in and sees only the account role assigned by the server.
+013. **Bogota D.C. / history:** A signed-in citizen can revisit and delete only personal saved queries.
