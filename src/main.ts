@@ -22,6 +22,10 @@ const router = createRouter({
 });
 
 router.beforeEach(async (target) => {
+  if (target.path === '/acceder') {
+    void initializeAccountSession();
+    return true;
+  }
   await initializeAccountSession();
   return resolveAccountNavigation(target.path, Boolean(target.meta.requiresAccount), Boolean(accountProfile.value));
 });

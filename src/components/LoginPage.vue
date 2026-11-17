@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import GoogleSignIn from './GoogleSignIn.vue';
 import { loginAccount, registerAccount } from '../services/accountApi';
@@ -22,7 +22,6 @@ const submit = async () => {
       ? await loginAccount(email.value, password.value)
       : await registerAccount(email.value, password.value);
     password.value = '';
-    await router.replace('/');
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'No fue posible acceder a NormBuild.';
   } finally {
@@ -36,7 +35,11 @@ const changeMode = () => {
   error.value = '';
 };
 
-const finishGoogleLogin = () => router.replace('/');
+const finishGoogleLogin = () => undefined;
+
+watch(accountProfile, (profile) => {
+  if (profile) void router.replace('/');
+}, { immediate: true });
 </script>
 
 <template>
