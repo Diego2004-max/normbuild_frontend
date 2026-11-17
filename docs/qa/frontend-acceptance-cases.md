@@ -10,3 +10,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 006. **Bogota D.C. / worker:** The document worker normalizes a multiline project description without freezing text input.
 007. **Bogota D.C. / validation:** A short or empty project description shows a Spanish validation message and disables submission.
 008. **Bogota D.C. / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
+009. **Bogota D.C. / progress:** A checklist request shows streamed progress and elapsed time while the backend is working.
