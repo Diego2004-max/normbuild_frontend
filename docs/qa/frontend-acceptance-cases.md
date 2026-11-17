@@ -96,3 +96,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 092. **Cartagena / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
 093. **Cartagena / progress:** A checklist request shows streamed progress and elapsed time while the backend is working.
 094. **Cartagena / calculation:** Proposed area ratios are displayed separately from unverified legal maximums.
+095. **Cartagena / citations:** Every cited source offers an external link and expandable excerpt without clipping substantive text.
