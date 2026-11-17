@@ -74,3 +74,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 070. **Bucaramanga / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
 071. **Barranquilla / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
 072. **Barranquilla / coverage:** The coverage status reflects the API result, including source count and section count when available.
+073. **Barranquilla / missing-coverage:** When coverage is absent, the interface explains the limitation without claiming that a legal rule was found.
