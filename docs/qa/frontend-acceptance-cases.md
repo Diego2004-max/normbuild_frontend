@@ -37,3 +37,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 033. **Medellin / source-review:** A discovered source is labeled pending review until an administrator confirms and imports it.
 034. **Medellin / worker:** The document worker normalizes a multiline project description without freezing text input.
 035. **Medellin / validation:** A short or empty project description shows a Spanish validation message and disables submission.
+036. **Medellin / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
