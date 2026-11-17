@@ -33,6 +33,10 @@ const request = async <T>(path: string, options: RequestInit = {}): Promise<T> =
 };
 
 export const getAccount = () => request<AccountProfile>('/me');
+export const getGoogleConfig = () => request<{ clientId: string }>('/google/config');
+export const loginWithGoogle = (credential: string) => request<AccountProfile>('/google', {
+  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ credential }),
+});
 export const registerAccount = (email: string, password: string) => request<AccountProfile>('/register', {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }),
 });
