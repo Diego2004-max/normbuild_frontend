@@ -3,6 +3,7 @@ WORKDIR /workspace
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY index.html .
+COPY public ./public
 COPY src ./src
 COPY tsconfig.json tailwind.config.ts postcss.config.js vite.config.ts ./
 RUN npm run build
