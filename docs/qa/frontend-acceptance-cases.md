@@ -88,3 +88,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 084. **Barranquilla / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
 085. **Cartagena / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
 086. **Cartagena / coverage:** The coverage status reflects the API result, including source count and section count when available.
+087. **Cartagena / missing-coverage:** When coverage is absent, the interface explains the limitation without claiming that a legal rule was found.
