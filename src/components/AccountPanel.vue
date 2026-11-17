@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import {
-  deleteHistoryItem, fetchHistory, getAccount, loginAccount, logoutAccount, registerAccount,
+  deleteHistoryItem, fetchHistory, loginAccount, logoutAccount, registerAccount,
 } from '../services/accountApi';
-import type { AccountProfile, QueryHistoryItem } from '../services/accountApi';
+import type { QueryHistoryItem } from '../services/accountApi';
+import { accountProfile } from '../services/accountSession';
 
-const props = defineProps<{ profile: AccountProfile | null; refreshKey: number }>();
 const emit = defineEmits<{
-  'update:profile': [profile: AccountProfile | null];
   restore: [jurisdiction: string, description: string];
 }>();
 
@@ -20,7 +19,7 @@ const history = ref<QueryHistoryItem[]>([]);
 const expanded = ref<string | null>(null);
 
 const loadHistory = async () => {
-  if (!props.profile) return;
+  if (!accountProfile.value) return;
   try {
     history.value = await fetchHistory();
   } catch (cause) {
@@ -28,16 +27,7 @@ const loadHistory = async () => {
   }
 };
 
-onMounted(async () => {
-  try {
-    emit('update:profile', await getAccount());
-  } catch {
-    emit('update:profile', null);
-  }
-});
-
-watch(() => props.profile, loadHistory);
-watch(() => props.refreshKey, loadHistory);
+watch(accountProfile, loadHistory, { immediate: true });
 
 const submit = async () => {
   error.value = '';
@@ -47,7 +37,7 @@ const submit = async () => {
       ? await registerAccount(email.value, password.value)
       : await loginAccount(email.value, password.value);
     password.value = '';
-    emit('update:profile', profile);
+    accountProfile.value = profile;
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'No se pudo acceder a la cuenta.';
   } finally {
@@ -60,7 +50,7 @@ const signOut = async () => {
   pending.value = true;
   try {
     await logoutAccount();
-    emit('update:profile', null);
+    accountProfile.value = null;
     history.value = [];
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'No se pudo cerrar la sesión.';
@@ -87,12 +77,12 @@ const removeItem = async (id: string) => {
         <h2 class="text-lg font-bold">Tu espacio de consultas</h2>
         <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Consulta sin cuenta o inicia sesión para guardar tu historial privado.</p>
       </div>
-      <span v-if="profile" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100">
-        {{ profile.role === 'ADMIN' ? 'Administrador' : 'Ciudadano' }}
+      <span v-if="accountProfile" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100">
+        {{ accountProfile.role === 'ADMIN' ? 'Administrador' : 'Ciudadano' }}
       </span>
     </div>
 
-    <form v-if="!profile" class="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end" @submit.prevent="submit">
+    <form v-if="!accountProfile" class="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end" @submit.prevent="submit">
       <label class="text-sm font-medium">Correo electrónico
         <input v-model="email" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-950" type="email" autocomplete="email" maxlength="320" required />
       </label>
@@ -109,7 +99,7 @@ const removeItem = async (id: string) => {
 
     <div v-else class="mt-4">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <p class="break-all text-sm">{{ profile.email }}</p>
+        <p class="break-all text-sm">{{ accountProfile.email }}</p>
         <button class="text-sm font-semibold text-civic-blue underline dark:text-sky-300" type="button" :disabled="pending" @click="signOut">Cerrar sesión</button>
       </div>
       <h3 class="mt-5 text-sm font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">Consultas guardadas</h3>

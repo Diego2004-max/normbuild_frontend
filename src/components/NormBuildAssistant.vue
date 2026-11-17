@@ -3,9 +3,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { fetchJurisdictionCoverage, importOfficialSource, requestComplianceChecklist, searchOfficialSources } from '../services/regulationApi';
 import { findConflictingJurisdiction } from '../services/jurisdictionMismatch';
 import { sourcePreview } from '../services/sourcePreview';
-import AccountPanel from './AccountPanel.vue';
 import { importAdminSource, requestSavedChecklist } from '../services/accountApi';
-import type { AccountProfile } from '../services/accountApi';
+import { accountProfile, restoredDraft } from '../services/accountSession';
 import type { JurisdictionCoverage, OfficialSourceCandidate } from '../services/regulationApi';
 import type {
   ComplianceChecklistResponse,
@@ -19,8 +18,6 @@ const isDarkMode = ref(false);
 const isValidating = ref(false);
 const isSubmitting = ref(false);
 const answer = ref<ComplianceChecklistResponse | null>(null);
-const accountProfile = ref<AccountProfile | null>(null);
-const historyRefreshKey = ref(0);
 const validationIssues = ref<WorkerValidationIssue[]>([]);
 const formattedDescription = ref('');
 const wordCount = ref(0);
@@ -206,6 +203,11 @@ watch(jurisdiction, () => {
 });
 
 onMounted(async () => {
+  if (restoredDraft.value) {
+    jurisdiction.value = restoredDraft.value.jurisdiction;
+    projectDescription.value = restoredDraft.value.description;
+    restoredDraft.value = null;
+  }
   try {
     coverage.value = await fetchJurisdictionCoverage();
   } catch {
@@ -241,7 +243,6 @@ const submitQuery = async () => {
       : await requestComplianceChecklist(query, (progress) => {
         answer.value = progress;
       });
-    if (accountProfile.value) historyRefreshKey.value += 1;
   } catch (error) {
     requestError.value =
       error instanceof Error
@@ -251,14 +252,6 @@ const submitQuery = async () => {
     window.clearInterval(submissionTimer);
     isSubmitting.value = false;
   }
-};
-
-const restoreQuery = (savedJurisdiction: string, description: string) => {
-  jurisdiction.value = savedJurisdiction;
-  projectDescription.value = description;
-  answer.value = null;
-  requestError.value = '';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 onBeforeUnmount(() => {
@@ -279,12 +272,16 @@ onBeforeUnmount(() => {
             Consulta requisitos oficiales con contexto normativo trazable y procesamiento asíncrono.
           </p>
         </div>
-        <label class="flex items-center gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-medium shadow-sm dark:border-slate-700 dark:bg-slate-900">
-          <span>Modo oscuro</span>
-          <input v-model="isDarkMode" class="h-5 w-5 accent-civic-blue" type="checkbox" />
-        </label>
+        <div class="flex flex-wrap items-center gap-3">
+          <RouterLink to="/cuenta" class="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-civic-blue shadow-sm transition hover:border-civic-blue dark:border-slate-700 dark:bg-slate-900 dark:text-sky-300">
+            {{ accountProfile ? 'Mi cuenta e historial' : 'Iniciar sesión' }}
+          </RouterLink>
+          <label class="flex items-center gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-medium shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <span>Modo oscuro</span>
+            <input v-model="isDarkMode" class="h-5 w-5 accent-civic-blue" type="checkbox" />
+          </label>
+        </div>
       </header>
-      <AccountPanel v-model:profile="accountProfile" :refresh-key="historyRefreshKey" @restore="restoreQuery" />
 
       <div class="grid flex-1 gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <section class="rounded-md bg-white p-5 shadow-panel dark:bg-slate-900">
