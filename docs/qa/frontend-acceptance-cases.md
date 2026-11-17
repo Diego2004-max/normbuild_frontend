@@ -90,3 +90,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 086. **Cartagena / coverage:** The coverage status reflects the API result, including source count and section count when available.
 087. **Cartagena / missing-coverage:** When coverage is absent, the interface explains the limitation without claiming that a legal rule was found.
 088. **Cartagena / discovery:** Source discovery displays official HTTPS candidates for the selected municipality.
+089. **Cartagena / source-review:** A discovered source is labeled pending review until an administrator confirms and imports it.
