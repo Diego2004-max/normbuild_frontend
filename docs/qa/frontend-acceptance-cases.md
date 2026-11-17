@@ -33,3 +33,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 029. **Medellin / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
 030. **Medellin / coverage:** The coverage status reflects the API result, including source count and section count when available.
 031. **Medellin / missing-coverage:** When coverage is absent, the interface explains the limitation without claiming that a legal rule was found.
+032. **Medellin / discovery:** Source discovery displays official HTTPS candidates for the selected municipality.
