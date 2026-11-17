@@ -109,3 +109,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 105. **Manizales / validation:** A short or empty project description shows a Spanish validation message and disables submission.
 106. **Manizales / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
 107. **Manizales / progress:** A checklist request shows streamed progress and elapsed time while the backend is working.
+108. **Manizales / calculation:** Proposed area ratios are displayed separately from unverified legal maximums.
