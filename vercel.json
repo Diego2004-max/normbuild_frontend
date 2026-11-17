@@ -8,6 +8,10 @@
     {
       "source": "/cuenta",
       "destination": "/index.html"
+    },
+    {
+      "source": "/acceder",
+      "destination": "/index.html"
     }
   ]
 }
