@@ -24,3 +24,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 020. **Pasto / worker:** The document worker normalizes a multiline project description without freezing text input.
 021. **Pasto / validation:** A short or empty project description shows a Spanish validation message and disables submission.
 022. **Pasto / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
+023. **Pasto / progress:** A checklist request shows streamed progress and elapsed time while the backend is working.
