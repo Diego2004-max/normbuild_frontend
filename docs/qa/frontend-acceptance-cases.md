@@ -108,3 +108,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 104. **Manizales / worker:** The document worker normalizes a multiline project description without freezing text input.
 105. **Manizales / validation:** A short or empty project description shows a Spanish validation message and disables submission.
 106. **Manizales / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
+107. **Manizales / progress:** A checklist request shows streamed progress and elapsed time while the backend is working.
