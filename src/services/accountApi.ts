@@ -19,17 +19,24 @@ export interface QueryHistoryItem {
 }
 
 const request = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
-  const response = await fetch(`/api/account${path}`, {
-    ...options,
-    credentials: 'same-origin',
-    headers: { Accept: 'application/json', ...options.headers },
-  });
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({})) as { message?: string };
-    throw new Error(body.message ?? 'No fue posible completar la solicitud de cuenta.');
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 4_000);
+  try {
+    const response = await fetch(`/api/account${path}`, {
+      ...options,
+      credentials: 'same-origin',
+      headers: { Accept: 'application/json', ...options.headers },
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({})) as { message?: string };
+      throw new Error(body.message ?? 'No fue posible completar la solicitud de cuenta.');
+    }
+    if (response.status === 204) return undefined as T;
+    return response.json() as Promise<T>;
+  } finally {
+    window.clearTimeout(timeout);
   }
-  if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
 };
 
 export const getAccount = async () => (await request<AccountProfile | undefined>('/me')) ?? null;
