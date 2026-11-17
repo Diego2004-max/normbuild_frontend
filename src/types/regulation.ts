@@ -11,7 +11,7 @@ export interface CitedRegulationResponse {
   sourceUrl: string | null;
   similarity: number;
   excerpt: string;
-  sourceType: 'INDEXED_VECTOR' | 'LIVE_WEB';
+  sourceType: 'INDEXED_VECTOR' | 'LIVE_WEB' | 'OFFICIAL_BASELINE';
 }
 
 export interface ComplianceChecklistResponse {
@@ -19,7 +19,7 @@ export interface ComplianceChecklistResponse {
   riskLevel: string;
   citations: CitedRegulationResponse[];
   generatedAt: string;
-  generationMode?: 'PENDING' | 'GENERATIVE' | 'WEB_RESEARCH' | 'UNAVAILABLE' | 'NO_CONTEXT';
+  generationMode?: 'PENDING' | 'GENERATIVE' | 'VERIFIED_GUIDANCE' | 'WEB_RESEARCH' | 'UNAVAILABLE' | 'NO_CONTEXT';
   projectAnalysis?: ProjectAnalysisResponse;
 }
 
