@@ -44,15 +44,13 @@ const sourceImportError = ref('');
 const sourceImportSuccess = ref('');
 const numberFormatter = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
 
-const signOut = async () => {
+const signOut = () => {
   signOutPending.value = true;
-  try {
-    await logoutAccount();
-    accountProfile.value = null;
-    await router.replace('/acceder');
-  } finally {
+  accountProfile.value = null;
+  void router.replace('/acceder');
+  void logoutAccount().catch(() => undefined).finally(() => {
     signOutPending.value = false;
-  }
+  });
 };
 const indexFormatter = new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
 const areaLabel = (value: number | null) => value === null ? 'No indicada' : `${numberFormatter.format(value)} m²`;

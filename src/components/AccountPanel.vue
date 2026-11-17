@@ -45,18 +45,14 @@ const submit = async () => {
   }
 };
 
-const signOut = async () => {
+const signOut = () => {
   error.value = '';
   pending.value = true;
-  try {
-    await logoutAccount();
-    accountProfile.value = null;
-    history.value = [];
-  } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : 'No se pudo cerrar la sesión.';
-  } finally {
+  accountProfile.value = null;
+  history.value = [];
+  void logoutAccount().catch(() => undefined).finally(() => {
     pending.value = false;
-  }
+  });
 };
 
 const removeItem = async (id: string) => {
