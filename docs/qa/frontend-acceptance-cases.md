@@ -52,3 +52,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 048. **Cali / worker:** The document worker normalizes a multiline project description without freezing text input.
 049. **Cali / validation:** A short or empty project description shows a Spanish validation message and disables submission.
 050. **Cali / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
+051. **Cali / progress:** A checklist request shows streamed progress and elapsed time while the backend is working.
