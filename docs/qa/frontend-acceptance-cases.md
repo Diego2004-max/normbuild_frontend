@@ -59,3 +59,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 055. **Cali / history:** A signed-in citizen can revisit and delete only personal saved queries.
 056. **Cali / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
 057. **Bucaramanga / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
+058. **Bucaramanga / coverage:** The coverage status reflects the API result, including source count and section count when available.
