@@ -92,3 +92,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 088. **Cartagena / discovery:** Source discovery displays official HTTPS candidates for the selected municipality.
 089. **Cartagena / source-review:** A discovered source is labeled pending review until an administrator confirms and imports it.
 090. **Cartagena / worker:** The document worker normalizes a multiline project description without freezing text input.
+091. **Cartagena / validation:** A short or empty project description shows a Spanish validation message and disables submission.
