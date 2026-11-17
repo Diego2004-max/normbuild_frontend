@@ -1,36 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { getGoogleConfig, loginWithGoogle } from '../services/accountApi';
 import { accountProfile } from '../services/accountSession';
+import { renderGoogleSignInButton } from '../services/googleIdentity';
 
 defineProps<{ compact?: boolean }>();
 const emit = defineEmits<{ authenticated: [] }>();
-
-interface GoogleIdentityClient {
-  initialize(options: { client_id: string; callback: (response: { credential: string }) => void }): void;
-  renderButton(element: HTMLElement, options: { theme: string; size: string; text: string; locale: string; width: number }): void;
-}
-
-declare global {
-  interface Window { google?: { accounts: { id: GoogleIdentityClient } } }
-}
-
 const buttonHost = ref<HTMLElement | null>(null);
 const loading = ref(true);
 const unavailable = ref(false);
 const error = ref('');
-
-const loadGoogleScript = async () => {
-  if (window.google) return;
-  await new Promise<void>((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('No se pudo cargar el acceso con Google.'));
-    document.head.appendChild(script);
-  });
-};
+let releaseGoogleHandler: (() => void) | null = null;
 
 onMounted(async () => {
   try {
@@ -39,26 +19,15 @@ onMounted(async () => {
       unavailable.value = true;
       return;
     }
-    await loadGoogleScript();
-    if (!window.google || !buttonHost.value) throw new Error('Google no respondió. Intenta nuevamente.');
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      callback: async ({ credential }) => {
-        error.value = '';
-        try {
-          accountProfile.value = await loginWithGoogle(credential);
-          emit('authenticated');
-        } catch (cause) {
-          error.value = cause instanceof Error ? cause.message : 'No se pudo acceder con Google.';
-        }
-      },
-    });
-    window.google.accounts.id.renderButton(buttonHost.value, {
-      theme: 'outline',
-      size: 'large',
-      text: 'continue_with',
-      locale: 'es',
-      width: Math.min(buttonHost.value.clientWidth, 360),
+    if (!buttonHost.value) throw new Error('No se pudo preparar el acceso con Google.');
+    releaseGoogleHandler = await renderGoogleSignInButton(buttonHost.value, clientId, async (credential) => {
+      error.value = '';
+      try {
+        accountProfile.value = await loginWithGoogle(credential);
+        emit('authenticated');
+      } catch (cause) {
+        error.value = cause instanceof Error ? cause.message : 'No se pudo acceder con Google.';
+      }
     });
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'No se pudo cargar el acceso con Google.';
@@ -66,6 +35,8 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
+onBeforeUnmount(() => releaseGoogleHandler?.());
 </script>
 
 <template>
