@@ -66,3 +66,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 062. **Bucaramanga / worker:** The document worker normalizes a multiline project description without freezing text input.
 063. **Bucaramanga / validation:** A short or empty project description shows a Spanish validation message and disables submission.
 064. **Bucaramanga / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
+065. **Bucaramanga / progress:** A checklist request shows streamed progress and elapsed time while the backend is working.
