@@ -31,3 +31,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 027. **Pasto / history:** A signed-in citizen can revisit and delete only personal saved queries.
 028. **Pasto / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
 029. **Medellin / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
+030. **Medellin / coverage:** The coverage status reflects the API result, including source count and section count when available.
