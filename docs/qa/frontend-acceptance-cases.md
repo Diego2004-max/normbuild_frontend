@@ -39,3 +39,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 035. **Medellin / validation:** A short or empty project description shows a Spanish validation message and disables submission.
 036. **Medellin / mismatch:** A description naming another municipality prompts correction before a checklist request is sent.
 037. **Medellin / progress:** A checklist request shows streamed progress and elapsed time while the backend is working.
+038. **Medellin / calculation:** Proposed area ratios are displayed separately from unverified legal maximums.
