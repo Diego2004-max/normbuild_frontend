@@ -57,3 +57,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 053. **Cali / citations:** Every cited source offers an external link and expandable excerpt without clipping substantive text.
 054. **Cali / account:** A citizen can register or sign in and sees only the account role assigned by the server.
 055. **Cali / history:** A signed-in citizen can revisit and delete only personal saved queries.
+056. **Cali / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
