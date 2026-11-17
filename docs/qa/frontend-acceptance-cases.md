@@ -63,3 +63,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 059. **Bucaramanga / missing-coverage:** When coverage is absent, the interface explains the limitation without claiming that a legal rule was found.
 060. **Bucaramanga / discovery:** Source discovery displays official HTTPS candidates for the selected municipality.
 061. **Bucaramanga / source-review:** A discovered source is labeled pending review until an administrator confirms and imports it.
+062. **Bucaramanga / worker:** The document worker normalizes a multiline project description without freezing text input.
