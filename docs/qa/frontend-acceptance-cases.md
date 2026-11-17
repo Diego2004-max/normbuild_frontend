@@ -73,3 +73,4 @@ These are manual acceptance scenarios, not evidence that the checks have passed.
 069. **Bucaramanga / history:** A signed-in citizen can revisit and delete only personal saved queries.
 070. **Bucaramanga / responsive-theme:** The light default, dark toggle, keyboard focus, and single-column mobile layout remain usable.
 071. **Barranquilla / selection:** Selecting this municipality updates the jurisdiction field without changing the project description.
+072. **Barranquilla / coverage:** The coverage status reflects the API result, including source count and section count when available.
